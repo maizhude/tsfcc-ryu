@@ -69,6 +69,9 @@ OFPT_GET_ASYNC_REPLY = 27           # Controller/switch message
 OFPT_SET_ASYNC = 28                 # Controller/switch message
 
 OFPT_METER_MOD = 29                 # Controller/switch message
+OFPT_QUEUE_LENGTH_REQUEST = 30      # Controller/switch message
+OFPT_BUF_CN = 35                    # Controller/switch message
+OFPT_BUF_CR = 36                    # Controller/switch message
 
 # struct ofp_port
 OFP_MAX_PORT_NAME_LEN = 16
@@ -253,6 +256,7 @@ OFPAT_DEC_NW_TTL = 24           # Decrement IP TTL.
 OFPAT_SET_FIELD = 25            # Set a header field using OXM TLV format.
 OFPAT_PUSH_PBB = 26             # Push a new PBB service tag (I-TAG)
 OFPAT_POP_PBB = 27              # Pop the outer PBB service tag (I-TAG)
+OFPAT_SET_RWND = 30
 OFPAT_EXPERIMENTER = 0xffff
 
 # struct ofp_action_header
@@ -306,6 +310,11 @@ assert calcsize(OFP_ACTION_POP_MPLS_PACK_STR) == OFP_ACTION_POP_MPLS_SIZE
 OFP_ACTION_SET_FIELD_PACK_STR = '!HH4x'
 OFP_ACTION_SET_FIELD_SIZE = 8
 assert calcsize(OFP_ACTION_SET_FIELD_PACK_STR) == OFP_ACTION_SET_FIELD_SIZE
+
+# struct ofp_action_set_rwnd
+OFP_ACTION_SET_RWND_PACK_STR = '!HHH2x'
+OFP_ACTION_SET_RWND_SIZE = 8
+assert calcsize(OFP_ACTION_SET_RWND_PACK_STR) == OFP_ACTION_SET_RWND_SIZE
 
 # struct ofp_action_experimenter_header
 OFP_ACTION_EXPERIMENTER_HEADER_PACK_STR = '!HHI'
@@ -416,6 +425,18 @@ OFP_METER_MOD_PACK_STR = '!HHI'
 OFP_METER_MOD_SIZE = 16
 assert (calcsize(OFP_METER_MOD_PACK_STR) + OFP_HEADER_SIZE ==
         OFP_METER_MOD_SIZE)
+
+# struct ofpt_queue_length_request
+OFPT_QUEUE_LENGTH_REQUEST_PACK_STR = '!I4x'
+OFPT_QUEUE_LENGTH_REQUEST_SIZE = 16
+assert (calcsize(OFPT_QUEUE_LENGTH_REQUEST_PACK_STR) + OFP_HEADER_SIZE ==
+        OFPT_QUEUE_LENGTH_REQUEST_SIZE)
+
+# struct ofpt_buf_cn/ofpt_buf_cr
+OFPT_BUF_CN_OR_CR_PACK_STR = '!I4xQQQQQQQQQQQQIIIH2xQ'
+OFPT_BUF_CN_OR_CR_SIZE = 128
+assert (calcsize(OFPT_BUF_CN_OR_CR_PACK_STR) == OFPT_BUF_CN_OR_CR_SIZE)
+
 
 # enum ofp_meter
 OFPM_MAX = 0xffff0000

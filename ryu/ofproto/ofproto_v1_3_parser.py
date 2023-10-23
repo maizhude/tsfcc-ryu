@@ -2341,6 +2341,53 @@ class OFPPacketIn(MsgBase):
 
         return msg
 
+@_register_parser
+@_set_msg_type(ofproto.OFPT_QUEUE_LENGTH_REQUEST)
+class OFPQueueLengthRequest(MsgBase):
+
+    def __init__(self, datapath, data=None):
+        super(OFPQueueLengthRequest, self).__init__(datapath)
+        self.data = data
+
+    @classmethod
+    def parser(cls, datapath, buf):
+        msg = super(OFPQueueLengthRequest, cls).parser(datapath, buf)
+        msg.data = msg.buf[ofproto.OFP_HEADER_SIZE:]
+        return msg
+    def _serialize_body(self):
+        msg_pack_into(ofproto.OFPT_QUEUE_LENGTH_REQUEST_PACK_STR,
+                      self.buf, ofproto.OFP_HEADER_SIZE,
+                      self.data)
+
+@_register_parser
+@_set_msg_type(ofproto.OFPT_BUF_CN)
+class OFPBufCn(MsgBase):
+
+    def __init__(self, datapath, data=None):
+        super(OFPBufCn, self).__init__(datapath)
+        self.data = data
+
+    @classmethod
+    def parser(cls, datapath, version, msg_type, msg_len, xid, buf):
+        msg = super(OFPBufCn, cls).parser(datapath, version, msg_type, msg_len, xid, buf)
+        msg.data = msg.buf[ofproto.OFP_HEADER_SIZE:]
+        return msg
+
+@_register_parser
+@_set_msg_type(ofproto.OFPT_BUF_CR)
+class OFPBufCr(MsgBase):
+
+    def __init__(self, datapath, data=None):
+        super(OFPBufCr, self).__init__(datapath)
+        self.data = data
+
+    @classmethod
+    def parser(cls, datapath, version, msg_type, msg_len, xid, buf):
+        msg = super(OFPBufCr, cls).parser(datapath, version, msg_type, msg_len, xid, buf)
+        msg.data = msg.buf[ofproto.OFP_HEADER_SIZE:]
+        return msg
+
+
 
 @_register_parser
 @_set_msg_type(ofproto.OFPT_FLOW_REMOVED)
@@ -3081,6 +3128,34 @@ class OFPActionGroup(OFPAction):
         msg_pack_into(ofproto.OFP_ACTION_GROUP_PACK_STR, buf,
                       offset, self.type, self.len, self.group_id)
 
+@OFPAction.register_action_type(ofproto.OFPAT_SET_RWND,
+                                ofproto.OFP_ACTION_SET_RWND_SIZE)
+class OFPActionSetRWND(OFPAction):
+    """
+    SET_RWND action
+
+    This action indicates test something.
+
+    ================ ======================================================
+    Attribute        Description
+    ================ ======================================================
+    rwnd             uint16_t
+    ================ ======================================================
+    """
+
+    def __init__(self, rwnd, type_=None, len_=None):
+        super(OFPActionSetRWND, self).__init__()
+        self.rwnd = rwnd
+
+    @classmethod
+    def parser(cls, buf, offset):
+        (type_, len_, rwnd) = struct.unpack_from(
+            ofproto.OFP_ACTION_SET_RWND_PACK_STR, buf, offset)
+        return cls(rwnd)
+
+    def serialize(self, buf, offset):
+        msg_pack_into(ofproto.OFP_ACTION_SET_RWND_PACK_STR, buf,
+                      offset, self.type, self.len, self.rwnd)
 
 @OFPAction.register_action_type(ofproto.OFPAT_SET_QUEUE,
                                 ofproto.OFP_ACTION_SET_QUEUE_SIZE)
